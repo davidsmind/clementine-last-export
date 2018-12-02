@@ -17,7 +17,7 @@
 
 """Module containing the GUI of the clementine_last_export tool"""
 
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 import sys, os
 import platform
@@ -34,7 +34,7 @@ SERVER_LIST = ["last.fm", "libre.fm"]
 # Import icons resource to have the icon image
 import icons_rc
 
-class ClemLastExportGui(QtGui.QMainWindow):
+class ClemLastExportGui(QtWidgets.QMainWindow):
 
     def __init__(self):
         """Init function of the class, called at each creation"""
@@ -60,19 +60,19 @@ class ClemLastExportGui(QtGui.QMainWindow):
         """   
         #MenuBar
         ##Exit menu
-        self.exitAction = QtGui.QAction('&Exit', self)        
+        self.exitAction = QtWidgets.QAction('&Exit', self)        
         self.exitAction.setShortcut('Ctrl+Q')
         self.exitAction.setStatusTip('Exit application')
-        self.exitAction.triggered.connect(QtGui.qApp.quit)
+        self.exitAction.triggered.connect(QtWidgets.QApplication.quit)
         
         ##Import menu
-        self.importAction = QtGui.QAction('&Run', self)
+        self.importAction = QtWidgets.QAction('&Run', self)
         self.importAction.triggered.connect(self.run_script)
         
         ##About menu
-        self.aboutAction = QtGui.QAction('&About Clementine Last Export', self)
+        self.aboutAction = QtWidgets.QAction('&About Clementine Last Export', self)
         self.aboutAction.triggered.connect(self.open_about)
-        self.aboutQtAction = QtGui.QAction('&About Qt', self)
+        self.aboutQtAction = QtWidgets.QAction('&About Qt', self)
         self.aboutQtAction.triggered.connect(self.open_aboutQt)
 
         ##Menubar getting all the previously defined menus
@@ -87,39 +87,39 @@ class ClemLastExportGui(QtGui.QMainWindow):
         
         #Main window
         ##Part import
-        self.lbl_part_import = QtGui.QLabel('Information about the server', self)
+        self.lbl_part_import = QtWidgets.QLabel('Information about the server', self)
         self.lbl_part_import.resize(200, 20)
         self.lbl_part_import.move(15, 30)
         
         ###Server selection
-        self.lbl_combo_server  = QtGui.QLabel('Select the server', self)
+        self.lbl_combo_server  = QtWidgets.QLabel('Select the server', self)
         self.lbl_combo_server.resize(120, 20)
         self.lbl_combo_server.move(20, 60)        
         
-        self.server_combo = QtGui.QComboBox(self)
+        self.server_combo = QtWidgets.QComboBox(self)
         for server in SERVER_LIST:
             self.server_combo.addItem(server)
         self.server_combo.move(140, 55)
         self.server_combo.activated[str].connect(self.serverChanged)
         
         ###Server credentials
-        self.lbl_username  = QtGui.QLabel('Username', self)
+        self.lbl_username  = QtWidgets.QLabel('Username', self)
         self.lbl_username.move(20, 90)
-        self.field_username = QtGui.QLineEdit(self)
+        self.field_username = QtWidgets.QLineEdit(self)
         self.field_username.move(140, 90)
         self.field_username.textChanged[str].connect(self.usernameChanged)
         
         ###Part target
         # Definition of the two radio buttons
-        self.playcount_radio_button = QtGui.QRadioButton('Import playcount', self)
+        self.playcount_radio_button = QtWidgets.QRadioButton('Import playcount', self)
         self.playcount_radio_button.resize(160, 20)
         self.playcount_radio_button.move(20, 140)
-        self.lovedtracks_radio_button = QtGui.QRadioButton('Import loved tracks', self)
+        self.lovedtracks_radio_button = QtWidgets.QRadioButton('Import loved tracks', self)
         self.lovedtracks_radio_button.resize(160, 20)
         self.lovedtracks_radio_button.move(20, 170)
         
         #Creation of the group of radio buttons
-        self.radio_group = QtGui.QButtonGroup(self)
+        self.radio_group = QtWidgets.QButtonGroup(self)
         self.radio_group.addButton(self.playcount_radio_button)
         self.radio_group.addButton(self.lovedtracks_radio_button)
         #Only one radio button can be selected at once
@@ -127,37 +127,37 @@ class ClemLastExportGui(QtGui.QMainWindow):
         self.radio_group.buttonClicked.connect(self.targetChanged)
                 
         ##Part options
-        self.lbl_part_update = QtGui.QLabel('Options', self)
+        self.lbl_part_update = QtWidgets.QLabel('Options', self)
         self.lbl_part_update.move(15, 200)
         
         #Checkbox to activate or not the backup of the database
-        self.backup_checkbox = QtGui.QCheckBox('Backup database', self)
+        self.backup_checkbox = QtWidgets.QCheckBox('Backup database', self)
         self.backup_checkbox.resize(200, 20)
         self.backup_checkbox.move(20, 230)
         self.backup_checkbox.stateChanged.connect(self.backupChanged)
         
         #Checkbox to activate the force of the update (see tooltip for more information)
-        self.force_update_checkbox = QtGui.QCheckBox('Force update', self)
+        self.force_update_checkbox = QtWidgets.QCheckBox('Force update', self)
         self.force_update_checkbox.resize(200, 20)
         self.force_update_checkbox.move(20, 260)
         self.force_update_checkbox.stateChanged.connect(self.forceUpdateChanged)
         self.force_update_checkbox.setToolTip('Check this box if you want to force the update\n - of loved tracks already rated at 4.5 stars\n - of playcounts higher locally than the one on the music server')
         
         #Checkbox to activate the use of a cache file
-        self.use_cache_checkbox = QtGui.QCheckBox('Use cache file (if available)', self)
+        self.use_cache_checkbox = QtWidgets.QCheckBox('Use cache file (if available)', self)
         self.use_cache_checkbox.resize(200, 20)
         self.use_cache_checkbox.move(20, 290)
         self.use_cache_checkbox.stateChanged.connect(self.useCacheChanged)
         self.use_cache_checkbox.setToolTip('Check this box if you want to use the cache file from a previous import')        
         
-        self.progressbar = QtGui.QProgressBar(self)
+        self.progressbar = QtWidgets.QProgressBar(self)
         self.progressbar.setMinimum(0)
         self.progressbar.setMaximum(100)
         self.progressbar.resize(260, 20)
         self.progressbar.move(20, 320)        
         
         ###Run button
-        self.update_button = QtGui.QPushButton('Run', self)
+        self.update_button = QtWidgets.QPushButton('Run', self)
         self.update_button.setToolTip('Run the script')
         self.update_button.resize(self.update_button.sizeHint())
         self.update_button.move(190, 150)  
@@ -200,7 +200,7 @@ class ClemLastExportGui(QtGui.QMainWindow):
     def center(self):
         """Function called to center the main window to the display screen"""         
         qr = self.frameGeometry()
-        cp = QtGui.QDesktopWidget().availableGeometry().center()
+        cp = QtWidgets.QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
         
@@ -305,7 +305,7 @@ class ClemLastExportGui(QtGui.QMainWindow):
         :param message: Message sent from the thread
         :type message: string
         """
-        QtGui.QMessageBox.information(self, u"Operation finished", msg)        
+        QtWidgets.QMessageBox.information(self, u"Operation finished", msg)        
         self.statusBar().showMessage('Import completed')
         
     def open_about(self):
@@ -314,11 +314,11 @@ class ClemLastExportGui(QtGui.QMainWindow):
         <br/><br/>
         Developed by Vincent VERDEIL<br/><br/>
         <a href="http://code.google.com/p/clementine-last-export/">http://code.google.com/p/clementine-last-export/</a>"""
-        QtGui.QMessageBox.about(self,"About Clementine Last Export", about_text)
+        QtWidgets.QMessageBox.about(self,"About Clementine Last Export", about_text)
         
     def open_aboutQt(self):
         """Function called when the aboutQt dialog is requested"""
-        QtGui.QMessageBox.aboutQt(self)
+        QtWidgets.QMessageBox.aboutQt(self)
         
     def get_cachepath(self):
         """Function called to create the cache repository next to the Clementine data
@@ -351,7 +351,7 @@ class ClemLastExportGui(QtGui.QMainWindow):
        
 def main():
     """Main method of the script, called when the script is run"""
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     cleg = ClemLastExportGui()
     sys.exit(app.exec_())
 

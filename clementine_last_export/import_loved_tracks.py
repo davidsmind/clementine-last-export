@@ -18,7 +18,7 @@
 
 import os
 
-from PyQt4 import QtCore
+from PyQt5 import QtCore
 
 from optparse import OptionParser
 import logging
