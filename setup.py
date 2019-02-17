@@ -4,7 +4,7 @@
 from distutils.core import setup
 
 setup(name='clementine_last_export',
-      version='0.353535',
+      version='0.5',
       description='Tool to import playcounts and loved tracks from your last.fm account into Clementine',
       author='David Mattatall',
       author_email='davidsmind@gmail.com',
