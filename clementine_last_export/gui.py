@@ -34,11 +34,13 @@ SERVER_LIST = ["last.fm", "libre.fm"]
 # Import icons resource to have the icon image
 import icons_rc
 
-class ClemLastExportGui(QtWidgets.QMainWindow):
+class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self):
         """Init function of the class, called at each creation"""
-        super(ClemLastExportGui, self).__init__()
+        super(Ui_MainWindow, self).__init__()
+        
+                
         self.cache_path = self.get_cachepath()
         self.configfile = os.path.expanduser("%sconfig.pkl" %self.cache_path)
         if os.path.exists(self.configfile):
@@ -51,135 +53,239 @@ class ClemLastExportGui(QtWidgets.QMainWindow):
             self.config["force_update"] = False
             self.config["use_cache"] = True
             self.config["target"] = Update_playcount
-        self.initUI()
+        #self.setupUi()
                 
         
-    def initUI(self):
+    def setupUi(self, MainWindow):
         """Initialisation of the UI, called during the creation of an instance of the 
         class, to create the main window and its elements
         """   
         #MenuBar
         ##Exit menu
-        self.exitAction = QtWidgets.QAction('&Exit', self)        
-        self.exitAction.setShortcut('Ctrl+Q')
-        self.exitAction.setStatusTip('Exit application')
-        self.exitAction.triggered.connect(QtWidgets.QApplication.quit)
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(402, 359)
         
-        ##Import menu
-        self.importAction = QtWidgets.QAction('&Run', self)
-        self.importAction.triggered.connect(self.run_script)
+        #FIXME LOAD Window ICON not working
+        self.setWindowIcon(QtGui.QIcon(':/myresources/clementine_last_export.png'))
         
-        ##About menu
-        self.aboutAction = QtWidgets.QAction('&About Clementine Last Export', self)
-        self.aboutAction.triggered.connect(self.open_about)
-        self.aboutQtAction = QtWidgets.QAction('&About Qt', self)
-        self.aboutQtAction.triggered.connect(self.open_aboutQt)
-
-        ##Menubar getting all the previously defined menus
-        self.menubar = self.menuBar()
-        self.fileMenu = self.menubar.addMenu('&File')
-        self.fileMenu.addAction(self.exitAction)
-        self.fileMenu2 = self.menubar.addMenu('&Import')
-        self.fileMenu2.addAction(self.importAction)         
-        self.fileMenu3 = self.menubar.addMenu('&About')
-        self.fileMenu3.addAction(self.aboutAction)
-        self.fileMenu3.addAction(self.aboutQtAction) 
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
+        MainWindow.setSizePolicy(sizePolicy)
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
         
-        #Main window
-        ##Part import
-        self.lbl_part_import = QtWidgets.QLabel('Information about the server', self)
-        self.lbl_part_import.resize(200, 20)
-        self.lbl_part_import.move(15, 30)
+        self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
+        self.gridLayout.setObjectName("gridLayout")
         
-        ###Server selection
-        self.lbl_combo_server  = QtWidgets.QLabel('Select the server', self)
-        self.lbl_combo_server.resize(120, 20)
-        self.lbl_combo_server.move(20, 60)        
+        self.progressbar = QtWidgets.QProgressBar(self.centralwidget)
+        self.progressbar.setProperty("value", 24)
+        self.progressbar.setObjectName("progressbar")
+        self.gridLayout.addWidget(self.progressbar, 17, 0, 1, 1)
         
-        self.server_combo = QtWidgets.QComboBox(self)
-        for server in SERVER_LIST:
-            self.server_combo.addItem(server)
-        self.server_combo.move(140, 55)
-        self.server_combo.activated[str].connect(self.serverChanged)
-        
-        ###Server credentials
-        self.lbl_username  = QtWidgets.QLabel('Username', self)
-        self.lbl_username.move(20, 90)
-        self.field_username = QtWidgets.QLineEdit(self)
-        self.field_username.move(140, 90)
-        self.field_username.textChanged[str].connect(self.usernameChanged)
+              
+        ####Run button
+        self.update_button = QtWidgets.QPushButton(self.centralwidget)
+        self.update_button.setFocusPolicy(QtCore.Qt.WheelFocus)
+        self.update_button.setObjectName("update_button")
+        self.update_button.setToolTip('Run the script')
+        self.update_button.clicked.connect(self.run_script)
+        ##Run button can be triggered by pressing the return key
+        self.update_button.setShortcut(self.update_button.tr("Return"))    
+        self.gridLayout.addWidget(self.update_button, 17, 4, 1, 1)
         
         ###Part target
         # Definition of the two radio buttons
-        self.playcount_radio_button = QtWidgets.QRadioButton('Import playcount', self)
-        self.playcount_radio_button.resize(160, 20)
-        self.playcount_radio_button.move(20, 140)
-        self.lovedtracks_radio_button = QtWidgets.QRadioButton('Import loved tracks', self)
-        self.lovedtracks_radio_button.resize(160, 20)
-        self.lovedtracks_radio_button.move(20, 170)
-        
+        self.playcount_radio_button = QtWidgets.QRadioButton('Import playcount', self.centralwidget)
+        #self.playcount_radio_button.setObjectName("playcount_radio_button")
+        self.gridLayout.addWidget(self.playcount_radio_button, 3, 0, 1, 1)
+        self.lovedtracks_radio_button = QtWidgets.QRadioButton('Import loved tracks', self.centralwidget)
+        #self.lovedtracks_radio_button.setObjectName("lovedtracks_radio_button")
+        self.gridLayout.addWidget(self.lovedtracks_radio_button, 2, 0, 1, 1)
+
         #Creation of the group of radio buttons
-        self.radio_group = QtWidgets.QButtonGroup(self)
+        self.radio_group = QtWidgets.QButtonGroup(self.centralwidget)
         self.radio_group.addButton(self.playcount_radio_button)
         self.radio_group.addButton(self.lovedtracks_radio_button)
         #Only one radio button can be selected at once
         self.radio_group.setExclusive(True)
         self.radio_group.buttonClicked.connect(self.targetChanged)
-                
-        ##Part options
-        self.lbl_part_update = QtWidgets.QLabel('Options', self)
-        self.lbl_part_update.move(15, 200)
-        
-        #Checkbox to activate or not the backup of the database
-        self.backup_checkbox = QtWidgets.QCheckBox('Backup database', self)
-        self.backup_checkbox.resize(200, 20)
-        self.backup_checkbox.move(20, 230)
-        self.backup_checkbox.stateChanged.connect(self.backupChanged)
-        
-        #Checkbox to activate the force of the update (see tooltip for more information)
-        self.force_update_checkbox = QtWidgets.QCheckBox('Force update', self)
-        self.force_update_checkbox.resize(200, 20)
-        self.force_update_checkbox.move(20, 260)
-        self.force_update_checkbox.stateChanged.connect(self.forceUpdateChanged)
-        self.force_update_checkbox.setToolTip('Check this box if you want to force the update\n - of loved tracks already rated at 4.5 stars\n - of playcounts higher locally than the one on the music server')
-        
-        #Checkbox to activate the use of a cache file
-        self.use_cache_checkbox = QtWidgets.QCheckBox('Use cache file (if available)', self)
-        self.use_cache_checkbox.resize(200, 20)
-        self.use_cache_checkbox.move(20, 290)
+
+        self.use_cache_checkbox = QtWidgets.QCheckBox(self.centralwidget)
+        self.use_cache_checkbox.setObjectName("use_cache_checkbox")
         self.use_cache_checkbox.stateChanged.connect(self.useCacheChanged)
         self.use_cache_checkbox.setToolTip('Check this box if you want to use the cache file from a previous import')        
+        self.gridLayout.addWidget(self.use_cache_checkbox, 10, 0, 1, 1)
         
-        self.progressbar = QtWidgets.QProgressBar(self)
-        self.progressbar.setMinimum(0)
-        self.progressbar.setMaximum(100)
-        self.progressbar.resize(260, 20)
-        self.progressbar.move(20, 320)        
+        ##Checkbox to activate or not the backup of the database
+        self.backup_checkbox = QtWidgets.QCheckBox(self.centralwidget)
+        self.backup_checkbox.setObjectName("backup_checkbox")
+        self.backup_checkbox.stateChanged.connect(self.backupChanged)
+        self.gridLayout.addWidget(self.backup_checkbox, 8, 0, 1, 1)
         
-        ###Run button
-        self.update_button = QtWidgets.QPushButton('Run', self)
-        self.update_button.setToolTip('Run the script')
-        self.update_button.resize(self.update_button.sizeHint())
-        self.update_button.move(190, 150)  
-        self.update_button.clicked.connect(self.run_script)
-        #Run button can be triggered by pressing the return key
-        self.update_button.setShortcut(self.update_button.tr("Return"))        
+        self.frame = QtWidgets.QFrame(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(100)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
         
-        ##Global window
-        self.resize(300, 370)
-        self.center()
-        self.setWindowTitle('Clementine Last Export')  
-        self.setWindowIcon(QtGui.QIcon(':/myresources/clementine_last_export.png'))
+        self.frame.setSizePolicy(sizePolicy)
+        self.frame.setMinimumSize(QtCore.QSize(300, 100))
+        self.frame.setMaximumSize(QtCore.QSize(300, 100))
+        self.frame.setFrameShape(QtWidgets.QFrame.Box)
+        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame.setObjectName("frame")
+        self.gridLayout_2 = QtWidgets.QGridLayout(self.frame)
+        self.gridLayout_2.setObjectName("gridLayout_2")
+        self.serverDetailsLabelRO = QtWidgets.QLabel(self.frame)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.serverDetailsLabelRO.sizePolicy().hasHeightForWidth())
         
-        #Status bar 
-        self.statusBar().showMessage('Ready')
+        self.serverDetailsLabelRO.setSizePolicy(sizePolicy)
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setWeight(75)
+        self.serverDetailsLabelRO.setFont(font)
+        self.serverDetailsLabelRO.setAlignment(QtCore.Qt.AlignHCenter|QtCore.Qt.AlignTop)
+        self.serverDetailsLabelRO.setObjectName("serverDetailsLabelRO")
+        self.gridLayout_2.addWidget(self.serverDetailsLabelRO, 0, 0, 1, 1, QtCore.Qt.AlignLeft)
+        self.username_LabelRO = QtWidgets.QLabel(self.frame)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(1)
+        sizePolicy.setHeightForWidth(self.username_LabelRO.sizePolicy().hasHeightForWidth())
+        self.username_LabelRO.setSizePolicy(sizePolicy)
+        self.username_LabelRO.setMinimumSize(QtCore.QSize(100, 10))
+        self.username_LabelRO.setObjectName("username_LabelRO")
+        self.gridLayout_2.addWidget(self.username_LabelRO, 1, 0, 1, 1)
+        self.field_username = QtWidgets.QLineEdit(self.frame)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(1)
+        sizePolicy.setHeightForWidth(self.field_username.sizePolicy().hasHeightForWidth())
+        self.field_username.setSizePolicy(sizePolicy)
+        self.field_username.setMinimumSize(QtCore.QSize(100, 20))
+        self.field_username.setObjectName("field_username")
+        self.field_username.textChanged[str].connect(self.usernameChanged)
+        self.gridLayout_2.addWidget(self.field_username, 1, 1, 1, 1)
+        self.selectServerLabelRO = QtWidgets.QLabel(self.frame)
+        self.selectServerLabelRO.setObjectName("selectServerLabelRO")
+        self.gridLayout_2.addWidget(self.selectServerLabelRO, 2, 0, 1, 1)
         
-        #Set the UI according to the value of config
+        self.server_combo = QtWidgets.QComboBox(self.frame)
+        self.server_combo.setMinimumSize(QtCore.QSize(0, 20))
+        self.server_combo.setObjectName("server_combo")
+        for server in SERVER_LIST:
+            self.server_combo.addItem(server)
+        self.server_combo.activated[str].connect(self.serverChanged)
+        
+        
+        self.gridLayout_2.addWidget(self.server_combo, 2, 1, 1, 1)
+        self.gridLayout.addWidget(self.frame, 1, 0, 1, 2)
+        
+        self.force_update_checkbox = QtWidgets.QCheckBox(self.centralwidget)
+        self.force_update_checkbox.setObjectName("force_update_checkbox")
+        self.force_update_checkbox.stateChanged.connect(self.forceUpdateChanged)
+        self.force_update_checkbox.setToolTip('Check this box if you want to force the update\n - of loved tracks already rated at 4.5 stars\n - of playcounts higher locally than the one on the music server')
+        self.gridLayout.addWidget(self.force_update_checkbox, 9, 0, 1, 1)
+        
+        self.optionsLabelRO = QtWidgets.QLabel(self.centralwidget)
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setWeight(75)
+        
+        self.optionsLabelRO.setFont(font)
+        self.optionsLabelRO.setAlignment(QtCore.Qt.AlignHCenter|QtCore.Qt.AlignTop)
+        self.optionsLabelRO.setObjectName("optionsLabelRO")
+        self.gridLayout.addWidget(self.optionsLabelRO, 4, 0, 1, 2, QtCore.Qt.AlignLeft|QtCore.Qt.AlignBottom)
+        
+        self.statusLabel = QtWidgets.QLabel(self.centralwidget)
+        self.statusLabel.setMaximumSize(QtCore.QSize(16777215, 10))
+        self.statusLabel.setObjectName("statusLabel")
+        self.gridLayout.addWidget(self.statusLabel, 18, 4, 1, 1)
+        
+        ###Menubar getting all the previously defined menus
+        MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 402, 26))
+        self.menubar.setObjectName("menubar")
+        self.menuFile = QtWidgets.QMenu(self.menubar)
+        self.menuFile.setObjectName("menuFile")
+        self.menuImport = QtWidgets.QMenu(self.menubar)
+        self.menuImport.setObjectName("menuImport")
+        self.menuAbout = QtWidgets.QMenu(self.menubar)
+        self.menuAbout.setObjectName("menuAbout")
+        MainWindow.setMenuBar(self.menubar)
+        
+        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.statusbar.setObjectName("statusbar")
+        MainWindow.setStatusBar(self.statusbar)
+        
+        self.actionExit = QtWidgets.QAction(MainWindow)
+        self.actionExit.setObjectName("actionExit")
+        self.actionExit.setShortcut('Ctrl+Q')
+        self.actionExit.setStatusTip('Exit application')
+        self.actionExit.triggered.connect(QtWidgets.QApplication.quit)
+        
+        ###About menu
+        self.actionAbout_Clementine_Last_Export = QtWidgets.QAction(MainWindow)
+        self.actionAbout_Clementine_Last_Export.setObjectName("actionAbout_Clementine_Last_Export")
+        self.actionAbout_QT = QtWidgets.QAction(MainWindow)
+        self.actionAbout_QT.setObjectName("actionAbout_QT")
+        self.actionAbout_QT.triggered.connect(self.open_aboutQt)
+        self.actionAbout_Clementine_Last_Export.triggered.connect(self.open_about)
+        
+        ###Import menu
+        self.importAction = QtWidgets.QAction(MainWindow)
+        self.importAction.setObjectName("importAction")
+        self.importAction.setStatusTip('Run Import')
+        self.importAction.triggered.connect(self.run_script)
+        self.menuFile.addAction(self.actionExit)
+        self.menuImport.addAction(self.importAction)
+        self.menuAbout.addAction(self.actionAbout_Clementine_Last_Export)
+        self.menuAbout.addAction(self.actionAbout_QT)
+        self.menubar.addAction(self.menuFile.menuAction())
+        self.menubar.addAction(self.menuImport.menuAction())
+        self.menubar.addAction(self.menuAbout.menuAction())
+
+        self.progressbar.reset()
+        
+        ##Status bar 
+        self.statusBar().showMessage('Ready') 
+        
         self.restore_config()
         
-        #Show the main window  
-        self.show()
-    
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+       
+       
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "Clementine Last Export"))
+        self.update_button.setText(_translate("MainWindow", "Run"))
+        self.lovedtracks_radio_button.setText(_translate("MainWindow", "Import loved"))
+        self.playcount_radio_button.setText(_translate("MainWindow", "Import playcount"))
+        self.use_cache_checkbox.setText(_translate("MainWindow", "Use Cache File (If Available)"))
+        self.backup_checkbox.setText(_translate("MainWindow", "Backup Database"))
+        self.serverDetailsLabelRO.setText(_translate("MainWindow", "Server Details"))
+        self.username_LabelRO.setText(_translate("MainWindow", "Username"))
+        self.field_username.setText(_translate("MainWindow", self.config["username"]))
+        self.selectServerLabelRO.setText(_translate("MainWindow", "Select The Server"))
+        self.force_update_checkbox.setText(_translate("MainWindow", "Force Update"))
+        self.optionsLabelRO.setText(_translate("MainWindow", "Options"))
+        self.statusLabel.setText(_translate("MainWindow", "Ready"))
+        self.menuFile.setTitle(_translate("MainWindow", "File"))
+        self.menuImport.setTitle(_translate("MainWindow", "Import"))
+        self.menuAbout.setTitle(_translate("MainWindow", "About"))
+        self.actionExit.setText(_translate("MainWindow", "Exit"))
+        self.actionAbout_Clementine_Last_Export.setText(_translate("MainWindow", "About Clementine Last Export"))
+        self.actionAbout_QT.setText(_translate("MainWindow", "About QT"))
+        self.importAction.setText(_translate("MainWindow", "Run"))
+        
+        
     def restore_config(self):
         """Function called to update the UI according to the configuration dictionary
         """
@@ -208,11 +314,10 @@ class ClemLastExportGui(QtWidgets.QMainWindow):
     def run_script(self):
         """Function called when pressing the "Run" button on the UI"""
         if self.config["username"] == '':
-            self.statusBar().showMessage('Username needed')
+            self.statusLabel.setText('Username needed')
         else: 
             cache_file = os.path.expanduser("%scache_%s.txt" %(self.cache_path, self.config["target"].__name__))
-            self.progressbar.reset()
-            self.statusBar().showMessage('Running')          
+            self.statusLabel.setText('Running')          
             debug("Running the process %s with the info: server = %s, username = %s, backup = %s, force update = %s, use cache = %s\n"
                     %(self.config["target"], self.config["server"], self.config["username"], self.config["backup_database"], self.config["force_update"], self.config["use_cache"]))
             
@@ -306,14 +411,14 @@ class ClemLastExportGui(QtWidgets.QMainWindow):
         :type message: string
         """
         QtWidgets.QMessageBox.information(self, u"Operation finished", msg)        
-        self.statusBar().showMessage('Import completed')
+        self.statusLabel.setText('Import completed')
         
     def open_about(self):
         """Function called when the about dialog is requested"""
         about_text="""<b>Clementine Last Export</b>
         <br/><br/>
-        Developed by Vincent VERDEIL<br/><br/>
-        <a href="http://code.google.com/p/clementine-last-export/">http://code.google.com/p/clementine-last-export/</a>"""
+        Developed by David Adrian Mattatall<br/><br/>
+        <a href="https://github.com/davidsmind/clementine-last-export/">https://github.com/davidsmind/clementine-last-export/</a>"""
         QtWidgets.QMessageBox.about(self,"About Clementine Last Export", about_text)
         
     def open_aboutQt(self):
@@ -345,15 +450,18 @@ class ClemLastExportGui(QtWidgets.QMainWindow):
         pickle.dump(self.config, open(self.configfile, 'w'))
         
     def load_config(self):
-        """Function called to load the configuraiton of the UI from a configuration file
+        """Function called to load the configuration of the UI from a configuration file
         """
         self.config = pickle.load(open(self.configfile))
        
 def main():
     """Main method of the script, called when the script is run"""
     app = QtWidgets.QApplication(sys.argv)
-    cleg = ClemLastExportGui()
-    sys.exit(app.exec_())
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec_()) 
 
 if __name__ == "__main__":
 
