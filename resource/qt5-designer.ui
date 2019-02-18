@@ -10,26 +10,20 @@
     <height>359</height>
    </rect>
   </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
   <property name="windowTitle">
    <string>Clementine Last Export</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="17" column="0">
-     <widget class="QProgressBar" name="progressbar">
+     <widget class="QProgressBar" name="progressBar">
       <property name="value">
        <number>24</number>
       </property>
      </widget>
     </item>
     <item row="17" column="4">
-     <widget class="QPushButton" name="update_button">
+     <widget class="QPushButton" name="pushButton">
       <property name="focusPolicy">
        <enum>Qt::WheelFocus</enum>
       </property>
@@ -41,38 +35,32 @@
     <item row="2" column="0">
      <widget class="QRadioButton" name="lovedtracks_radio_button">
       <property name="text">
-       <string>Import Loved</string>
+       <string>Import loved &lt;3</string>
       </property>
       <property name="autoExclusive">
        <bool>true</bool>
       </property>
-      <attribute name="buttonGroup">
-       <string notr="true">buttonGroup</string>
-      </attribute>
      </widget>
     </item>
     <item row="3" column="0">
      <widget class="QRadioButton" name="playcount_radio_button">
       <property name="text">
-       <string>Import Pla&amp;ycount</string>
+       <string>Import playcount</string>
       </property>
       <property name="autoExclusive">
        <bool>true</bool>
       </property>
-      <attribute name="buttonGroup">
-       <string notr="true">buttonGroup</string>
-      </attribute>
      </widget>
     </item>
     <item row="10" column="0">
-     <widget class="QCheckBox" name="use_cache_checkbox">
+     <widget class="QCheckBox" name="checkBox">
       <property name="text">
        <string>Use Cache File (If Available)</string>
       </property>
      </widget>
     </item>
     <item row="8" column="0">
-     <widget class="QCheckBox" name="backup_checkbox">
+     <widget class="QCheckBox" name="checkBox_3">
       <property name="text">
        <string>Backup Database</string>
       </property>
@@ -80,12 +68,6 @@
     </item>
     <item row="1" column="0" colspan="2">
      <widget class="QFrame" name="frame">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-        <horstretch>100</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
       <property name="minimumSize">
        <size>
         <width>300</width>
@@ -106,7 +88,7 @@
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0" alignment="Qt::AlignLeft">
-        <widget class="QLabel" name="serverDetailsLabelRO">
+        <widget class="QLabel" name="label">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -128,7 +110,7 @@
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="username_LabelRO">
+        <widget class="QLabel" name="label_4">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>1</horstretch>
@@ -147,7 +129,7 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QLineEdit" name="field_username">
+        <widget class="QLineEdit" name="lineEdit_2">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>1</horstretch>
@@ -166,14 +148,14 @@
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QLabel" name="selectServerLabelRO">
+        <widget class="QLabel" name="label_3">
          <property name="text">
           <string>Select The Server</string>
          </property>
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QComboBox" name="server_combo">
+        <widget class="QComboBox" name="comboBox">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -186,14 +168,14 @@
      </widget>
     </item>
     <item row="9" column="0">
-     <widget class="QCheckBox" name="force_update_checkbox">
+     <widget class="QCheckBox" name="checkBox_2">
       <property name="text">
        <string>Force Update</string>
       </property>
      </widget>
     </item>
     <item row="4" column="0" colspan="2" alignment="Qt::AlignLeft|Qt::AlignBottom">
-     <widget class="QLabel" name="optionsLabelRO">
+     <widget class="QLabel" name="label_2">
       <property name="font">
        <font>
         <weight>75</weight>
@@ -209,7 +191,7 @@
      </widget>
     </item>
     <item row="18" column="4">
-     <widget class="QLabel" name="statusLabel">
+     <widget class="QLabel" name="label_5">
       <property name="maximumSize">
        <size>
         <width>16777215</width>
@@ -242,7 +224,7 @@
     <property name="title">
      <string>&amp;Import</string>
     </property>
-    <addaction name="importAction"/>
+    <addaction name="actionRun"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -258,28 +240,25 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionExit">
    <property name="text">
-    <string>&amp;Exit</string>
+    <string>Exit</string>
    </property>
   </action>
   <action name="actionAbout_Clementine_Last_Export">
    <property name="text">
-    <string>&amp;About Clementine Last Export</string>
+    <string>About Clementine Last Export</string>
    </property>
   </action>
   <action name="actionAbout_QT">
    <property name="text">
-    <string>About &amp;QT</string>
+    <string>About QT</string>
    </property>
   </action>
-  <action name="importAction">
+  <action name="actionRun">
    <property name="text">
-    <string>&amp;Run</string>
+    <string>Run</string>
    </property>
   </action>
  </widget>
  <resources/>
  <connections/>
- <buttongroups>
-  <buttongroup name="buttonGroup"/>
- </buttongroups>
 </ui>
