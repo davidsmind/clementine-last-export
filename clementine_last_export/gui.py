@@ -39,8 +39,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         """Init function of the class, called at each creation"""
         super(Ui_MainWindow, self).__init__()
-        
-                
+                        
         self.cache_path = self.get_cachepath()
         self.configfile = os.path.expanduser("%sconfig.pkl" %self.cache_path)
         if os.path.exists(self.configfile):
@@ -53,21 +52,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.config["force_update"] = False
             self.config["use_cache"] = True
             self.config["target"] = Update_playcount
-        #self.setupUi()
                 
         
     def setupUi(self, MainWindow):
-        """Initialisation of the UI, called during the creation of an instance of the 
+        """Initialization of the UI, called during the creation of an instance of the 
         class, to create the main window and its elements
         """   
         #MenuBar
         ##Exit menu
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(402, 359)
-        
-        #FIXME LOAD Window ICON not working
-        self.setWindowIcon(QtGui.QIcon(':/myresources/clementine_last_export.png'))
-        
+                   
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -260,6 +255,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+                
+        MainWindow.setWindowIcon(QtGui.QIcon(':/myresources/clementine_last_export.png'))
+        MainWindow.show()
        
        
     def retranslateUi(self, MainWindow):
@@ -460,7 +458,6 @@ def main():
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
-    MainWindow.show()
     sys.exit(app.exec_()) 
 
 if __name__ == "__main__":
