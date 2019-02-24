@@ -289,7 +289,7 @@ def test_parse_line():
     assert parse_line("text\tJohn Doe\tTrack 1\ttext") == ("John Doe", "Track 1")
     
 def test_get_tracks():
-    print get_tracks("last.fm", "werdeil")
-    assert (page, totalpages, tracks) == get_tracks("last.fm", "werdeil")
+    print get_tracks("last.fm", "davidsmind")
+    assert (page, totalpages, tracks) == get_tracks("last.fm", "davidsmind")
 
 
