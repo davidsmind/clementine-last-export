@@ -76,9 +76,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.gridLayout.setObjectName("gridLayout")
         
         self.progressbar = QtWidgets.QProgressBar(self.centralwidget)
-        self.progressbar.setProperty("value", 24)
+        self.progressbar.setProperty("value", 100)
         self.progressbar.setObjectName("progressbar")
-        self.gridLayout.addWidget(self.progressbar, 17, 0, 1, 1)
+        self.gridLayout.addWidget(self.progressbar, 17, 0, 1, 0)
+        self.progressbar.setMaximumSize(QtCore.QSize(300, 40))
         
               
         ####Run button
@@ -247,7 +248,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.menubar.addAction(self.menuImport.menuAction())
         self.menubar.addAction(self.menuAbout.menuAction())
 
-        self.progressbar.reset()
+        #self.progressbar.reset()
         
         ##Status bar 
         self.statusbar.showMessage('Ready') 
