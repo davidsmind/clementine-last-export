@@ -22,9 +22,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os
 import platform
 import pickle
+import logging
 
 from optparse import OptionParser
-import logging
+from datetime import datetime
 from logging import info, warning, error, debug
 from update_playcount import Update_playcount
 from import_loved_tracks import Import_loved_tracks
@@ -197,10 +198,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.optionsLabelRO.setObjectName("optionsLabelRO")
         self.gridLayout.addWidget(self.optionsLabelRO, 4, 0, 1, 2, QtCore.Qt.AlignLeft|QtCore.Qt.AlignBottom)
         
-        self.statusLabel = QtWidgets.QLabel(self.centralwidget)
-        self.statusLabel.setMaximumSize(QtCore.QSize(16777215, 10))
-        self.statusLabel.setObjectName("statusLabel")
-        self.gridLayout.addWidget(self.statusLabel, 18, 4, 1, 1)
+        #self.statusLabel = QtWidgets.QLabel(self.centralwidget)
+        #self.statusLabel.setMaximumSize(QtCore.QSize(55, 12))
+        #self.statusLabel.setObjectName("statusLabel")
+        #self.gridLayout.addWidget(self.statusLabel, 18, 4, 1, 1)
         
         ###Menubar getting all the previously defined menus
         MainWindow.setCentralWidget(self.centralwidget)
@@ -249,7 +250,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.progressbar.reset()
         
         ##Status bar 
-        self.statusBar().showMessage('Ready') 
+        self.statusbar.showMessage('Ready') 
         
         self.restore_config()
         
@@ -274,7 +275,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.selectServerLabelRO.setText(_translate("MainWindow", "Select The Server"))
         self.force_update_checkbox.setText(_translate("MainWindow", "Force Update"))
         self.optionsLabelRO.setText(_translate("MainWindow", "Options"))
-        self.statusLabel.setText(_translate("MainWindow", "Ready"))
+        self.statusbar.showMessage(_translate("MainWindow", "Ready"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuImport.setTitle(_translate("MainWindow", "Import"))
         self.menuAbout.setTitle(_translate("MainWindow", "About"))
@@ -312,10 +313,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def run_script(self):
         """Function called when pressing the "Run" button on the UI"""
         if self.config["username"] == '':
-            self.statusLabel.setText('Username needed')
+            self.statusbar.showMessage('Username needed')
         else: 
             cache_file = os.path.expanduser("%scache_%s.txt" %(self.cache_path, self.config["target"].__name__))
-            self.statusLabel.setText('Running')          
+            self.statusbar.showMessage('Running')          
             debug("Running the process %s with the info: server = %s, username = %s, backup = %s, force update = %s, use cache = %s\n"
                     %(self.config["target"], self.config["server"], self.config["username"], self.config["backup_database"], self.config["force_update"], self.config["use_cache"]))
             
@@ -398,8 +399,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         """
         if button.text() == 'Import playcount':
             self.config["target"] = Update_playcount
+            self.most_recent_import()
         else:
             self.config["target"] = Import_loved_tracks
+            self.most_recent_import()
         self.store_config()
         
     def import_completed(self, msg):
@@ -408,8 +411,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         :param message: Message sent from the thread
         :type message: string
         """
-        QtWidgets.QMessageBox.information(self, u"Operation finished", msg)        
-        self.statusLabel.setText('Import completed')
+        QtWidgets.QMessageBox.information(self, "Operation finished", msg)        
+        self.statusbar.showMessage('Import completed')
         
     def open_about(self):
         """Function called when the about dialog is requested"""
@@ -451,7 +454,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         """Function called to load the configuration of the UI from a configuration file
         """
         self.config = pickle.load(open(self.configfile))
-       
+    
+    def most_recent_import(self):
+        path = os.path.expanduser("%scache_%s.txt" %(self.cache_path, self.config["target"].__name__))
+        if os.path.isfile(path):
+            fo = open(path, 'r')
+            cache_import_time = fo.readline(10)
+            ts = int(cache_import_time)
+            fo.close()
+            self.statusbar.showMessage("last updated on " + datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S'))
+            return cache_import_time
+
 def main():
     """Main method of the script, called when the script is run"""
     app = QtWidgets.QApplication(sys.argv)
