@@ -17,7 +17,6 @@
 
 """Module for exporting tracks through audioscrobbler API."""
 
-import urllib.request, urllib.error, urllib.parse, urllib.request, urllib.parse, urllib.error
 import re
 import os
 import time
@@ -287,13 +286,3 @@ def lastexporter(server, username, startpage, outfile, tracktype='recenttracks',
             if already_imported_lines != []:
                 info("Completed with already imported informations")
             outfileobj.close()
-
-#Test functions to be run with pytest
-def test_parse_line():
-    assert parse_line("text\tJohn Doe\tTrack 1\ttext") == ("John Doe", "Track 1")
-    
-def test_get_tracks():
-    print((get_tracks("last.fm", "davidsmind")))
-    assert (page, totalpages, tracks) == get_tracks("last.fm", "davidsmind")
-
-
