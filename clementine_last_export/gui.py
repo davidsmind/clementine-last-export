@@ -449,12 +449,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def store_config(self):
         """Function called to stored the configuration of the UI for the next use in a 
         configuration file"""
-        pickle.dump(self.config, open(self.configfile, 'w'))
+        pickle.dump(self.config, open(self.configfile, 'wb'))
         
     def load_config(self):
         """Function called to load the configuration of the UI from a configuration file
         """
-        self.config = pickle.load(open(self.configfile))
+        self.config = pickle.load(open(self.configfile, 'rb'))
     
     def most_recent_import(self):
         path = os.path.expanduser("%scache_%s.txt" %(self.cache_path, self.config["target"].__name__))

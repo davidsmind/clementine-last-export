@@ -150,8 +150,8 @@ def update_db_file(database, extract, force_update=True, updated_part="None", th
     nb_titles = 0
     for line in extract_file.readlines():
         titre, artiste = parse_line(line)
-        if biblio.has_key(artiste):
-            if biblio[artiste].has_key(titre):
+        if artiste in biblio:
+            if titre in biblio[artiste]:
                 biblio[artiste][titre] = biblio[artiste][titre] +1
             else:
                 biblio[artiste][titre] = 1
@@ -164,8 +164,8 @@ def update_db_file(database, extract, force_update=True, updated_part="None", th
             
     #Loop which will try to update the database with each entry of the dictionary
     titles_updated = 0           
-    for artiste in biblio.keys():
-        for titre in biblio[artiste].keys():
+    for artiste in list(biblio.keys()):
+        for titre in list(biblio[artiste].keys()):
             original_rating, original_playcount = is_in_db(connection, artiste, titre)
             if original_rating == None or original_playcount == -1:
                 not_matched.append(artiste + ' ' + titre)
@@ -192,9 +192,9 @@ def update_db_file(database, extract, force_update=True, updated_part="None", th
                 
     try:
         connection.commit()
-    except sqlite3.Error, err:
+    except sqlite3.Error as err:
         connection.rollback()
-        error(unicode(err.args[0]))            
+        error(str(err.args[0]))            
         
     extract_file.close()
     connection.close()

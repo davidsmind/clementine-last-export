@@ -17,7 +17,11 @@
 
 """Module for exporting tracks through audioscrobbler API."""
 
-import urllib2, urllib, time, re, os
+import urllib.request, urllib.error, urllib.parse, urllib.request, urllib.parse, urllib.error
+import re
+import os
+import time
+import requests
 import xml.etree.ElementTree as ET
 
 import logging
@@ -49,11 +53,11 @@ def connect_server(server, username, startpage, sleep_func=time.sleep, tracktype
 
     elif server == "last.fm":
         baseurl = 'http://ws.audioscrobbler.com/2.0/?'
-        urlvars = dict(method='user.get%s' % tracktype,
-                    api_key='e38cc7822bd7476fe4083e36ee69748e',
-                    user=username,
-                    page=startpage,
-                    limit=200)
+        urlvars = { 'method' : 'user.get%s' % tracktype,
+                    'api_key' : 'e38cc7822bd7476fe4083e36ee69748e',
+                    'user' : username,
+                    'page' : startpage,
+                    'limit' : '200'}
     else:
         if server[:7] != 'http://':
             server = 'http://%s' % server
@@ -64,24 +68,24 @@ def connect_server(server, username, startpage, sleep_func=time.sleep, tracktype
                     page=startpage,
                     limit=200)
 
-    url = baseurl + urllib.urlencode(urlvars)
+    url = requests.get(baseurl, params=urlvars).url
+
     for interval in (1, 5, 10, 62):
         try:
-            f = urllib2.urlopen(url)
+            f = requests.get(url) 
+
             break
-        except Exception, e:
+        except Exception as e:
             last_exc = e
             warning("Exception occurred, retrying in %d s: %s" % (interval, e))
             sleep_func(interval)
-    else:
-        error("Failed to open page %s" % urlvars['page'])
-        raise last_exc
+        else:
+            error("Failed to open page %s" % urlvars['page'])
+            raise last_exc
 
-    response = f.read()
+    response = f
     f.close()
 
-    #bad hack to fix bad xml
-    response = re.sub('\xef\xbf\xbe', '', response)
     return response
 
 def get_pageinfo(response, tracktype='recenttracks'):
@@ -151,7 +155,7 @@ def write_tracks(tracks, outfileobj):
     :return: None
     """
     for fields in tracks:
-        outfileobj.write(("\t".join(fields) + "\n").encode('utf-8'))
+        outfileobj.write("\t".join(fields) + "\n")
 
 def get_tracks(server, username, startpage=1, sleep_func=time.sleep, tracktype='recenttracks', firsttrack = None):
     """Get tracks from a server
@@ -171,7 +175,7 @@ def get_tracks(server, username, startpage=1, sleep_func=time.sleep, tracktype='
     """
     page = startpage
     response = connect_server(server, username, page, sleep_func, tracktype)
-    totalpages = get_pageinfo(response, tracktype)
+    totalpages = get_pageinfo(response.content, tracktype)
     import_finished = False
 
     if startpage > totalpages:
@@ -182,12 +186,12 @@ def get_tracks(server, username, startpage=1, sleep_func=time.sleep, tracktype='
         if page > startpage:
             response =  connect_server(server, username, page, sleep_func, tracktype)
 
-        tracklist = get_tracklist(response)
+        tracklist = get_tracklist(response.content)
 
         tracks = []
         for trackelement in tracklist:
             # Do not export the currently playing track.
-            if not trackelement.attrib.has_key("nowplaying") or not trackelement.attrib["nowplaying"]:
+            if "nowplaying" not in trackelement.attrib or not trackelement.attrib["nowplaying"]:
                 track = parse_track(trackelement)
                 if track == firsttrack:
                     import_finished = True
@@ -268,13 +272,13 @@ def lastexporter(server, username, startpage, outfile, tracktype='recenttracks',
                     #Can not use timestamp as key for loved/banned tracks as it's not unique
                     n += 1
                     trackdict.setdefault(n, track)
-    except ValueError, e:
+    except ValueError as e:
         exit(e)
     except Exception:
         raise
     finally:
         with open(outfile, 'w') as outfileobj:
-            tracks = sorted(trackdict.values(), reverse=True)
+            tracks = sorted(list(trackdict.values()), reverse=True)
             write_tracks(tracks, outfileobj)
             info("Wrote page %s-%s of %s to file %s" % (startpage, page, totalpages, outfile))
             
@@ -289,7 +293,7 @@ def test_parse_line():
     assert parse_line("text\tJohn Doe\tTrack 1\ttext") == ("John Doe", "Track 1")
     
 def test_get_tracks():
-    print get_tracks("last.fm", "davidsmind")
+    print((get_tracks("last.fm", "davidsmind")))
     assert (page, totalpages, tracks) == get_tracks("last.fm", "davidsmind")
 
 
